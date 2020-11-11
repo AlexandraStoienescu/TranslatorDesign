@@ -34,9 +34,174 @@ scan with {: return lexer.next_token(); :};
 terminal            SEMI, PLUS, MINUS, UMINUS, TIMES, LPAREN, RPAREN;
 terminal Integer    NUMBER;        // our scanner provides numbers as integers
 
-/* Non terminals */
-non terminal            expr_list;
-non terminal Integer    expr;      // used to store evaluated subexpressions
+/* Separators */
+terminal SEMICOLON; 
+terminal COMMA; 
+terminal LBRACE;  
+terminal RBRACE; 
+terminal RBRACK;  
+
+/* Arithmetic operations */
+terminal SUB; 
+terminal ADD; 
+terminal MULT; 
+terminal DIV; 
+terminal MOD; 
+ 
+/* Operators */
+terminal LT; 
+terminal GT; 
+terminal EQ; 
+terminal AND; 
+terminal ANDAND; 
+terminal OR; 
+terminal OROR; 
+terminal NOT; 
+terminal EQL; 
+terminal NE_OP; 
+terminal LE_OP; 
+terminal GE_OP; 
+    
+/* Types */
+terminal STRING; 
+terminal INT; 
+terminal REAL; 
+terminal String ID; 
+terminal Number NUMERIC_CONSTANT; 
+
+/* Keywords */ 
+
+terminal IF; 
+terminal PROGRAM; 
+terminal ENDPROGRAM; 
+terminal FUNCTION; 
+terminal ENDFUNCTION; 
+terminal THEN; 
+terminal ELSE; 
+terminal ENDIF; 
+terminal WHILE; 
+terminal FOR; 
+terminal TO;
+terminal DO; 
+terminal ENDDO; 
+terminal ENDFOR; 
+terminal RETURN; 
+
+terminal BREAK; 
+terminal CONTINUE; 
+terminal GOTO; 
+terminal DEFAULT; 
+  
+/* Functions */  
+ 
+terminal READ; 
+terminal MOVE;  
+terminal CLEAR; 
+terminal DRAW; 
+terminal String WRITE; 
+
+/* Output */
+
+terminal COLOR;
+terminal LINE;
+terminal RED;
+terminal BLUE;
+terminal YELLOW;
+terminal ORANGE;
+terminal PURPLE;
+terminal GREEN;
+terminal WHITE;
+terminal BLACK;
+
+/* Statements */
+non terminal  declaration_statement;
+non terminal  statement;
+non terminal  assignment_statement;
+non terminal  selection_statement;
+non terminal  if_statement;
+non terminal  while_statement;
+non terminal  do_statement;
+non terminal  for_statement;
+non terminal  return_statement;
+non terminal  embedded_statement;
+non terminal  iteration_statement;
+non terminal  block;
+non terminal  expression_statement;
+
+non terminal  local_variable_declaration;
+non terminal  for_initializer_opt;
+non terminal  for_iterator_opt; 
+
+/* Types */
+non terminal type_specifier;
+non terminal  type;
+non terminal  rest_type;
+non terminal  reference_type;
+
+non terminal  numeric_type;
+non terminal  integral_type;
+non terminal  floating_point_type;
+non terminal  character_type;
+non terminal  array_type; 
+
+/* Declarations */
+non terminal declaration;
+non terminal declaration_specifiers;
+non terminal declarator;
+non terminal init_declarator;
+non terminal init_declarator_list;
+
+/* Parameters */
+non terminal function_parameter_list;
+non terminal parameter_type_list;
+non terminal parameter_list;
+non terminal parameter_declaration;
+
+/* Variables and arguments */
+non terminal  argument_list_opt;
+non terminal   argument_list;
+non terminal  rank_specifiers;
+non terminal  rank_specifier;
+non terminal   dim_separators;
+non terminal  variable_declarators;
+non terminal  variable_initializer_list;
+
+
+/* Expressions */
+
+non terminal  argument;
+non terminal  expression;
+non terminal  parenthesized_expression;
+non terminal  primary_expression;
+non terminal  primary_no_array_creation_expression;
+
+non terminal  conditional_and_expression;
+non terminal  conditional_or_expression;
+non terminal  conditional_expression;
+non terminal  and_expression;
+non terminal  exclusive_or_expression;
+non terminal  inclusive_or_expression;
+
+non terminal  equality_expression;
+non terminal  unary_expression;
+non terminal  multiplicative_expression;
+non terminal  additive_expression;
+
+non terminal  variable_declarator;
+non terminal  variable_initializer; 
+
+
+
+/* Functions */
+non terminal string strings;
+non terminal colorid colors;
+non terminal widthinpixels widthPixels;
+
+/* Syntactic grammar */
+
+non terminal Unit goal;
+
+non terminal String name;
 
 /* Precedences */
 precedence left PLUS, MINUS;
@@ -44,6 +209,7 @@ precedence left TIMES;
 precedence left UMINUS;
 
 /* The grammar rules */
+start with goal;
 expr_list ::= expr_list expr:e SEMI         {: System.out.println(e); :}
             | expr:e SEMI                   {: System.out.println(e); :}
             ;
@@ -56,4 +222,400 @@ expr      ::= expr:e1 PLUS  expr:e2         {: RESULT = e1+e2;        :}
              | LPAREN expr:e RPAREN	         {: RESULT = e;           :}
              | NUMBER:n	                     {: RESULT = n;           :}
              ;
-       
+goal ::= 
+		compilation_unit:u 
+		 
+	; 
+ 
+name ::= 
+		ID:id 
+		  
+	 ;
+	 
+	 
+/* Declarations */
+
+declaration 
+	::= declaration_specifiers SEMICOLON 
+	| declaration_specifiers init_declarator_list SEMICOLON  
+	;
+  
+declaration_specifiers 
+	::= type_specifier
+	; 
+
+init_declarator_list
+	::= init_declarator
+	| init_declarator_list COMMA init_declarator
+	;
+
+init_declarator
+	::= declarator:d   
+	| declarator:d EQ initializer
+
+type_specifier
+	::= IDENTIFIER:ID 
+	| STRING
+	| INT
+	| REAL
+	;
+	
+/* Parameneters */
+
+function_parameter_list
+   	::= LPAREN parameter_type_list RPAREN 
+	| LPAREN RPAREN			
+	;
+
+parameter_type_list
+	::= parameter_list
+	| parameter_list COMMA
+	;
+
+parameter_list
+	::= parameter_declaration
+	| parameter_list COMMA parameter_declaration
+	;
+
+parameter_declaration
+	::= declaration_specifiers declarator:d {: s.addVar(d, dleft+1); :}
+	| declaration_specifiers
+	;
+	
+	
+/* Statements */
+
+statement
+	::= assignment_statement {: s.addStatement(); :}
+	| selection_statement   {: s.addStatement(); :}
+	| if_statement {: s.addStatement(); :}
+	| while_statement {: s.addStatement(); :}
+	| do_statement {: s.addStatement(); :}
+	| for_statement {: s.addStatement(); :}
+	| return_statement {: s.addStatement(); :}
+	;
+
+assignment_statement
+	::= SEMICOLON
+	| expression SEMICOLON
+	;
+
+selection_statement ::= 
+		if_statement:stm
+		
+	;
+
+if_statement ::= 
+		IF parenthesized_expression:exp embedded_statement:stm
+		
+	|	
+		IF parenthesized_expression:exp embedded_statement:stmT ELSE embedded_statement:stmE 
+		
+	;
+	
+while_statement ::= 
+		WHILE parenthesized_expression:exp embedded_statement:stm 
+		
+	;
+	
+do_statement ::= 
+		DO embedded_statement:stm WHILE parenthesized_expression:exp SEMICOLON
+		 
+	; 
+	
+for_statement ::= 
+		FOR for_initializer_opt:forInit SEMICOLON expression:exp SEMICOLON for_iterator_opt:vecStmExp embedded_statement:stm
+		  
+	|
+		FOR LPAREN for_initializer_opt:forInit SEMICOLON for_iterator_opt:vecStmExp embedded_statement:stm
+		 
+	; 
+	
+return_statement ::= 
+		RETURN expression:exp SEMICOLON
+		 
+	|
+		RETURN SEMICOLON
+		 
+	; 
+	
+embedded_statement ::= 
+		block:stm 
+		 
+	| 
+		SEMICOLON 
+		 
+	| 
+		expression_statement:stm 
+		 
+  | 
+   	selection_statement:stm 
+   	 
+	| 
+		iteration_statement:stm 
+	 
+	  
+	;
+
+iteration_statement ::= 
+		while_statement:stm 
+		 
+	| 
+		do_statement:stm 
+		 
+	| 
+		for_statement:stm 
+		 
+	;
+
+block ::= 
+		LBRACE statement_list_opt:vecStm RBRACE 
+		
+	;
+
+iteration_statement ::= 
+		while_statement:stm 
+		 
+	| 
+		do_statement:stm 
+		 
+	| 
+		for_statement:stm 
+	 
+	;
+
+parenthesized_expression ::= 
+		LPAREN expression:exp RPAREN 
+		
+
+
+return_statement ::= 
+		RETURN expression:exp SEMICOLON
+		  
+	|
+		RETURN SEMICOLON
+		 
+	; 
+
+	
+	
+/* Types */
+
+type ::=
+		name:n
+		 
+	|
+		rest_type:t
+		 
+	;
+	
+rest_type ::= 
+		numeric_type:t
+		  
+	| 
+		reference_type:t
+		 
+	
+	;
+
+numeric_type ::= 
+		integral_type:t 
+		 
+	| 
+		floating_point_type:t 
+		
+	|
+		character_type:t
+		
+	;
+
+integral_type ::= 
+		INT 
+		
+	;
+
+floating_point_type ::= 
+		REAL
+		 
+	; 
+
+character_type ::=
+		STRING 
+		 
+	;
+
+array_type ::= 
+		type:t rank_specifiers:vecDim
+		
+	; 
+
+rank_specifier ::= 
+		dim_separators:vecSep COMMA
+		
+	;
+	
+dim_separators ::= 
+		COMMA 
+	
+	|
+		dim_separators:vecSep COMMA 
+		
+	; 
+	
+	
+	
+/* Variables */
+
+statement ::= 
+		declaration_statement:stm 
+		 
+	| 
+		embedded_statement:stm 
+		 
+	;
+
+declaration_statement ::= 
+		local_variable_declaration:stmDeclVar SEMICOLON
+		
+	; 
+
+local_variable_declaration ::= 
+		type:t variable_declarators:vecAssigVar
+		 
+	; 
+
+variable_declarators ::= 
+		variable_declarator:assigVar 
+		
+	| 
+		variable_declarators:vecAssigVar COMMA variable_declarator:assigVar
+		  						
+	; 
+
+variable_declarator ::= 
+		ID:id 
+		
+	| 
+		ID:id EQ variable_initializer:expInit 
+		
+	;
+
+variable_initializer ::= 
+		expression:exp 
+		
+	;
+
+variable_initializer_list ::= 
+		variable_initializer:varInit
+		 				
+	|
+		variable_initializer_list:vecVarInit COMMA variable_initializer:varInit
+					
+	;	
+	
+	
+/* Expressions */
+
+argument_list_opt ::= 
+		argument_list:vecArg
+		 
+	|
+	;
+	
+argument_list ::= 
+		argument:arg
+		 
+	|
+		argument_list:vecArg COMMA argument:arg
+		  		
+	; 
+
+argument ::= 
+		expression:exp
+		    
+	;
+
+expression ::= 
+		conditional_expression:exp 
+	 
+	; 
+
+conditional_expression ::= 
+		conditional_or_expression:exp
+		   
+	; 
+	 	
+conditional_or_expression ::=
+		conditional_and_expression:exp
+		
+	| 
+		conditional_or_expression:exp1 OROR conditional_and_expression:exp2
+		 
+	; 
+
+conditional_and_expression ::= 
+		inclusive_or_expression:exp 
+		 
+	| 
+		conditional_and_expression:exp1 ANDAND inclusive_or_expression:exp2 
+		 
+	;
+
+inclusive_or_expression ::= 
+		exclusive_or_expression:exp 
+		
+	| 
+		inclusive_or_expression:exp1 OR exclusive_or_expression:exp2 
+		  
+	;
+
+exclusive_or_expression ::= 
+		and_expression:exp 
+		
+	;
+
+and_expression ::= 
+		equality_expression:exp 
+		
+	|
+		and_expression:exp1 AND equality_expression:exp2 
+		 
+	;
+
+equality_expression ::= 
+		additive_expression:exp 
+		
+	;
+
+additive_expression ::= 
+		multiplicative_expression:exp
+	
+	| 
+		additive_expression:exp1 PLUS multiplicative_expression:exp2  
+		 
+	| 
+		additive_expression:exp1 MINUS multiplicative_expression:exp2 
+	 
+	; 
+
+multiplicative_expression ::= 
+		unary_expression:expU 
+		
+	| 
+		multiplicative_expression:exp MULT unary_expression:expU
+		 
+	| 
+		multiplicative_expression:exp DIV unary_expression:expU 
+		 
+	| 
+		multiplicative_expression:exp MOD unary_expression:expU 
+		  
+	;
+
+unary_expression ::=	
+		PLUS unary_expression:expU
+		
+	| 
+		MINUS unary_expression:expU
+		
+	;
