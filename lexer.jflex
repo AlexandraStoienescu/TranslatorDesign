@@ -12,6 +12,50 @@ import java_cup.runtime.Symbol;
 %column
 
 %{
+public static final int SEMICOLON = 1;
+public static final int COMMA = 1;
+public static final int LBRACE = 1;
+public static final int RBRACE = 1;
+public static final int LPAREN = 1;
+public static final int RPAREN = 1;
+public static final int LBRACK = 1;
+public static final int RBRACK = 1;
+public static final int SUB = 1;
+public static final int ADD = 1;
+public static final int MULT = 1;
+public static final int DIV = 1;
+public static final int MOD = 1;
+public static final int LT = 1;
+public static final int GT = 1;
+public static final int AND = 1;
+public static final int OR = 1;
+public static final int NOT = 1;
+public static final int EQL = 1;
+public static final int NE_OP = 1;
+public static final int LE_OP = 1;
+public static final int GE_OP = 1;
+public static final int STRING = 1;
+public static final int INT = 1;
+public static final int REAL = 1;
+public static final int IF = 1;
+public static final int PROGRAM = 1;
+public static final int ENDPROGRAM = 1;
+public static final int FUNCTION = 1;
+public static final int ENDFUNCTION = 1;
+public static final int THEN = 1;
+public static final int ELSE = 1;
+public static final int ENDIF = 1;
+public static final int WHILE = 1;
+public static final int FOR = 1;
+public static final int TO = 1;
+public static final int DO = 1;
+public static final int ENDDO = 1;
+public static final int ENDFOR = 1;
+public static final int RETURN = 1;
+public static final int READ = 1;
+public static final int MOVE = 1;
+public static final int CLEAR = 1;
+public static final int DRAW = 1;
 private Symbol symbol(int sym) {
     return new Symbol(sym, yyline+1, yycolumn+1);
 }
